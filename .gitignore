@@ -1,0 +1,8 @@
+env/
+.vscode/
+venv/
+src/core.py~
+src/conf/.env~
+src/conf/settings.py~
+*~
+
