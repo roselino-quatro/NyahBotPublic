@@ -93,6 +93,35 @@ def libgen(update, context):
         response_message = "Livro não encontrado =<"
     context.bot.send_message(chat_id=update.effective_chat.id, text=response_message)
 
+def filme(update, context):
+    movie = update.message.text.partition(' ')[2]
+    url = "https://rapidapi.p.rapidapi.com/title/auto-complete"
+    querystring = {"q":movie}
+    headers = {
+        'x-rapidapi-host': "imdb8.p.rapidapi.com",
+        'x-rapidapi-key': "20519deff0msh4d5093c63f5136cp144481jsn19733fcef3af"
+        }
+    response = requests.request("GET", url, headers=headers, params=querystring)
+    info = json.loads(response.text)
+    id = info["d"][0]["id"]
+    title = info["d"][0]["l"]
+    poster = info["d"][0]["i"]["imageUrl"]
+    actors = info["d"][0]["s"]
+    url = "https://rapidapi.p.rapidapi.com/title/get-top-crew"
+    querystring = {"tconst":id}
+    response = requests.request("GET", url, headers=headers, params=querystring)
+    info = json.loads(response.text)
+    director = info["directors"][0]["name"]
+    url = "https://rapidapi.p.rapidapi.com/title/get-synopses"
+    response = requests.request("GET", url, headers=headers, params=querystring)
+    info = json.loads(response.text)
+    synopsis = info[0]["text"]
+    jmp = "\n"
+    tecnico = f'''<i>Título: {title}{jmp}Diretor: {director}{jmp}Atores: {actors}</i>'''
+    sinopse = f"Sinopse:\n{synopsis}"
+    context.bot.sendPhoto(chat_id=update.message.chat_id, photo=poster, caption=tecnico, parse_mode="html")
+    context.bot.send_message(chat_id=update.effective_chat.id, text=sinopse)
+
 def main(): 
     registered_chats = {}
 
@@ -121,6 +150,10 @@ def main():
 
     dispatcher.add_handler(
         CommandHandler('libgen', libgen)
+    )
+
+    dispatcher.add_handler(
+        CommandHandler('filme', filme)
     )
 
     updater.start_polling()
