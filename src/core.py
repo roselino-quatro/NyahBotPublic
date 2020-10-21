@@ -112,15 +112,13 @@ def filme(update, context):
     response = requests.request("GET", url, headers=headers, params=querystring)
     info = json.loads(response.text)
     director = info["directors"][0]["name"]
-    url = "https://rapidapi.p.rapidapi.com/title/get-synopses"
+    url = "https://rapidapi.p.rapidapi.com/title/get-plots"
     response = requests.request("GET", url, headers=headers, params=querystring)
     info = json.loads(response.text)
-    synopsis = info[0]["text"]
+    synopsis = info["plots"][0]["text"]
     jmp = "\n"
-    tecnico = f'''<i>Título: {title}{jmp}Diretor: {director}{jmp}Atores: {actors}</i>'''
-    sinopse = f"Sinopse:\n{synopsis}"
+    tecnico = f'''<i>Título: {title}{jmp}Diretor: {director}{jmp}Atores: {actors}{jmp}{jmp}Sinopse:{jmp}{synopsis}</i>'''
     context.bot.sendPhoto(chat_id=update.message.chat_id, photo=poster, caption=tecnico, parse_mode="html")
-    context.bot.send_message(chat_id=update.effective_chat.id, text=sinopse)
 
 def main(): 
     registered_chats = {}
